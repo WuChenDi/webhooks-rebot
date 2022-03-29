@@ -9,8 +9,6 @@ export default class Test extends Service {
    * @param name - your name
    */
   public async sayHi(name: string) {
-    const { app } = this;
-    console.log(app);
     return `hi, ${name}`;
   }
 }
