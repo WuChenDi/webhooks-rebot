@@ -15,14 +15,20 @@ export default (appInfo: EggAppInfo) => {
   // add your egg config in here
   config.middleware = [];
 
+  config.alinode = {
+    server: 'wss://agentserver.node.aliyun.com:8080',
+    appid: '',
+    secret: '',
+  };
+
   // add your special config in here
   const bizConfig = {
-    sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`
+    sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
   };
 
   // the return config will combines to EggAppConfig
   return {
     ...config,
-    ...bizConfig
+    ...bizConfig,
   };
 };
