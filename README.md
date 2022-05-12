@@ -52,6 +52,52 @@ $ npm start
 >
 > 📢 Typescript 2.8+
 
+## 代码结构
+
+```
+.
+├── app
+│   ├── controller
+│   │   ├── gitlab.ts
+│   │   └── home.ts
+│   ├── router.ts
+│   ├── service
+│   │   ├── gitlab.ts
+│   │   └── Test.ts
+│   └── utils
+│       └── index.ts
+├── appveyor.yml
+├── config
+│   ├── config.default.ts
+│   ├── config.local.ts
+│   ├── config.prod.ts
+│   └── plugin.ts
+├── LICENSE
+├── package.json
+├── README.md
+├── screenshots
+│   └── settings-webhooks.png
+├── test
+│   └── app
+│       ├── controller
+│       │   └── home.test.ts
+│       └── service
+│           └── Test.test.ts
+├── tsconfig.json
+└── typings
+    ├── app
+    │   ├── controller
+    │   │   └── index.d.ts
+    │   ├── index.d.ts
+    │   └── service
+    │       └── index.d.ts
+    ├── config
+    │   ├── index.d.ts
+    │   └── plugin.d.ts
+    └── index.d.ts
+
+```
+
 ## 🤝 参与共建
 
 如果您对这个项目感兴趣, 欢迎提 pull request, 也欢迎 "Star" 支持一下 ^\_^
