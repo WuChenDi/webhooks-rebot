@@ -4,108 +4,77 @@ const HEADER_KEY = 'x-gitlab-event';
 
 const HEADER_KEY_V2 = 'X-Gitlab-Event';
 
-enum EVENTSEnum {
-  PUSH_HOOK = 'Push Hook',
-  PIPELINE_HOOK = 'Pipeline Hook',
-  MERGE_REQUEST_HOOK = 'Merge Request Hook',
-  ISSUE_HOOK = 'Issue Hook',
-  RELEASE_HOOK = 'Release Hook',
-  NOTE_HOOK = 'Note Hook',
-  JOB_HOOK = 'Job Hook',
-  TAG_PUSH_HOOK = 'Tag Push Hook',
-  ACTION_UPDATE = 'update',
-}
+// export enum EVENTSEnum {
+//   PUSH_HOOK = 'Push Hook',
+//   PIPELINE_HOOK = 'Pipeline Hook',
+//   MERGE_REQUEST_HOOK = 'Merge Request Hook',
+//   ISSUE_HOOK = 'Issue Hook',
+//   RELEASE_HOOK = 'Release Hook',
+//   NOTE_HOOK = 'Note Hook',
+//   JOB_HOOK = 'Job Hook',
+//   TAG_PUSH_HOOK = 'Tag Push Hook',
+//   ACTION_UPDATE = 'update',
+// }
 
 export default class GitlabController extends Controller {
   public async index() {
     try {
       const { ctx, app } = this;
+      const { groupKey } = ctx.params;
 
-      const event = (ctx.request.header[HEADER_KEY] ||
-        ctx.request.header[HEADER_KEY_V2]) as string;
-
+      const event = (ctx.request.header[HEADER_KEY] || ctx.request.header[HEADER_KEY_V2]) as string;
       if (!event) {
-        ctx.body = 'Sorry, 这可能不是一个 gitlab 的 webhook 请求';
+        ctx.body = { msg: 'Sorry, this may not be a gitlab webhook request, suppressed.' };
         return;
       }
-      if (!ctx.params.id) {
-        ctx.body = '请输入 webhooks 地址';
+
+      // 微信群的webhookUrl通过群组的webhook的key进行url的拼接
+      const webhookUrl = `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${groupKey}`;
+      const message = await ctx.service.gitlab.translateMsg(ctx.request.body);
+
+      console.log('body', ctx.request.body);
+
+      if (!message || !webhookUrl) {
+        ctx.body = { msg: 'message or webhookUrl is empty or not supported, suppressed.' };
         return;
       }
-      const {
-        request: {
-          body: {
-            object_kind = '',
-            user_name,
-            commits,
-            user,
-            project: { path_with_namespace, web_url },
-            object_attributes,
-          },
+
+      // 调用微信群的webhook API
+      const result = await app.curl(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json; charset=UTF-8',
         },
-      } = ctx;
-      let mdMsg = '';
+        // 自动解析 JSON response
+        dataType: 'json',
+        // 3 秒超时
+        timeout: 3000,
+        data: message,
+      });
 
-      switch (event) {
-        case EVENTSEnum.PUSH_HOOK: {
-          const { id, message } = commits[0];
+      console.log(result);
 
-          mdMsg = `项目 [${path_with_namespace}](${web_url}) 收到一次push提交\n>提交者:  ${user_name}\n>commitID:  ${id}\n>最新提交信息:  ${message}`;
-          break;
-        }
-        case EVENTSEnum.PIPELINE_HOOK:
-          break;
-        case EVENTSEnum.MERGE_REQUEST_HOOK: {
-          const { name = '', avatar_url = '' } = user;
-          const {
-            title = '',
-            state,
-            url,
-            target_branch,
-            source_branch,
-          } = object_attributes;
-          mdMsg = `[${name}](${avatar_url})在 [${path_with_namespace}](${web_url}) 中${state}了一次${object_kind}\n>标题: ${title}\n>源分支: ${source_branch}\n>目标分支: ${target_branch}\n>[查看PR详情](${url})`;
-          break;
-        }
-        case EVENTSEnum.ISSUE_HOOK: {
-          const { name = '', avatar_url = '' } = user;
-          const { title = '', url, action } = object_attributes;
-          mdMsg = `[${name}](${avatar_url}) 在 [${path_with_namespace}](${web_url}) 中 ${action} 了一个issue\n>标题: ${title}\n>发起人: [${name}](${avatar_url})\n>[查看详情](${url})`;
-          break;
-        }
-        case EVENTSEnum.RELEASE_HOOK:
-          break;
-        case EVENTSEnum.NOTE_HOOK:
-          break;
-        case EVENTSEnum.JOB_HOOK:
-          break;
-        case EVENTSEnum.TAG_PUSH_HOOK:
-          break;
-        case EVENTSEnum.ACTION_UPDATE:
-          break;
-        default:
-      }
+      ctx.body = {
+        webhook_url: webhookUrl,
+        webhook_message: message,
+        status: result.status,
+        headers: result.headers,
+        package: result.data,
+      };
 
-      await app.curl(
-        `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${ctx.params.id}`,
-        {
-          headers: {
-            'Content-Type': 'application/json;charset=utf-8',
-          },
-          method: 'POST',
-          data: JSON.stringify({
-            msgtype: 'markdown',
-            markdown: { content: mdMsg },
-          }),
-        },
-      );
-
-      // console.log(event);
-      // console.log(ctx.request.body);
-      // console.log(ctx.res);
-      // console.log(ctx.req);
-      ctx.body = 'gitlab';
-      // ctx.body = await ctx.service.gitlab.sayHi('egg');
+      // await app.curl(
+      //   `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${ctx.params.id}`,
+      //   {
+      //     headers: {
+      //       'Content-Type': 'application/json;charset=utf-8',
+      //     },
+      //     method: 'POST',
+      //     data: JSON.stringify({
+      //       msgtype: 'markdown',
+      //       markdown: { content: mdMsg },
+      //     }),
+      //   },
+      // );
     } catch (error) {
       console.log(error);
     }

@@ -5,5 +5,5 @@ export default (app: Application) => {
 
   router.get('/', controller.home.index);
 
-  router.post('/gitlab/:id', controller.gitlab.index);
+  router.post('/gitlab/:groupKey', controller.gitlab.index);
 };
