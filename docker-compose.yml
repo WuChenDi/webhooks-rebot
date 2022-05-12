@@ -1,0 +1,7 @@
+version: "2"
+services:
+  midway:
+    build: .
+    image: flexrex/service-midway
+    ports:
+      - 7001:7001
