@@ -8,7 +8,7 @@
     "declarations": true
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-webhooks-rebot",
+    "start": "egg-scripts start --title=egg-server-webhooks-rebot",
     "stop": "egg-scripts stop --title=egg-server-webhooks-rebot",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
