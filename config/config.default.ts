@@ -17,8 +17,8 @@ export default (appInfo: EggAppInfo) => {
 
   config.alinode = {
     server: 'wss://agentserver.node.aliyun.com:8080',
-    appid: '',
-    secret: '',
+    appid: '484687',
+    secret: 'csSMfhxNtt5Yx7XMRQczKCc2cTPyGxibDj4P5kpf',
   };
 
   // add your special config in here
