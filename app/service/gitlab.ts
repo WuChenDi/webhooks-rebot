@@ -20,18 +20,24 @@ export default class WebhookService extends Service {
   // TODO: 需补充 gitlab 数据类型
   // https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html
   async translateMsg(data) {
-    const { object_kind } = data || {};
-    // 根据操作类型对应指定的方法
-    const matchFunc = OBJECT_KIND[object_kind];
-    if (!matchFunc) {
-      return false;
+    try {
+      const { object_kind } = data || {};
+      // 根据操作类型对应指定的方法
+      const matchFunc = OBJECT_KIND[object_kind];
+
+      if (!matchFunc) return false;
+
+      const res = await this[matchFunc](data);
+
+      if (!res) return false;
+
+      return {
+        msgtype: 'markdown',
+        markdown: { content: res.join(' \n  ') },
+      };
+    } catch (error) {
+      console.error(error);
     }
-    const res = await this[matchFunc](data);
-    if (!res) return false;
-    return {
-      msgtype: 'markdown',
-      markdown: { content: res.join(' \n  ') },
-    };
   }
 
   // 除tag以外的push操作信息处理
