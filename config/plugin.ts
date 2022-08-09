@@ -5,7 +5,7 @@ const plugin: EggPlugin = {
   nunjucks: {
     enable: true,
     // package: 'egg-view-nunjucks',
-    package: 'egg-alinode',
+    // package: 'egg-alinode',
   },
 };
 

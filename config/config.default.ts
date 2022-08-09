@@ -15,11 +15,11 @@ export default (appInfo: EggAppInfo) => {
   // add your egg config in here
   config.middleware = [];
 
-  config.alinode = {
-    server: 'wss://agentserver.node.aliyun.com:8080',
-    appid: '484687',
-    secret: 'csSMfhxNtt5Yx7XMRQczKCc2cTPyGxibDj4P5kpf',
-  };
+  // config.alinode = {
+  //   server: 'wss://agentserver.node.aliyun.com:8080',
+  //   appid: '484687',
+  //   secret: 'csSMfhxNtt5Yx7XMRQczKCc2cTPyGxibDj4P5kpf',
+  // };
 
   // add your special config in here
   const bizConfig = {
